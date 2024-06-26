@@ -1,4 +1,4 @@
 [workspace]
-members = [ "rvos","utest"]
+members = [ "kprobe","utest", "example" ]
 
 resolver = "2"
