@@ -12,6 +12,8 @@ mod kprobe;
 
 #[cfg(target_arch = "x86_64")]
 mod debug;
+mod static_keys;
+
 
 use core::panic::PanicInfo;
 

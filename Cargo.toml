@@ -1,4 +1,10 @@
 [workspace]
-members = [ "kprobe","utest", "example" ]
+members = [
+    "kprobe",
+    "utest",
+    "example" ,
+    "libbpf",
+    "jtable"
+]
 
 resolver = "2"
