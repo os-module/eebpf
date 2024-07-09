@@ -4,3 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+printf-compat = { git = "https://github.com/lights0123/printf-compat.git", default-features = false }

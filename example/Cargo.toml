@@ -16,3 +16,4 @@ spin = { version = "0.9.8", features = ["mutex"] }
 bit_field = "0.10.2"
 
 kprobe = { path = "../kprobe" }
+#jtable = { path = "../jtable" }

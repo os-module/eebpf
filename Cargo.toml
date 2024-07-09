@@ -4,7 +4,8 @@ members = [
     "utest",
     "example" ,
     "libbpf",
-    "jtable"
+    "jtable",
+    "rbpf"
 ]
 
 resolver = "2"

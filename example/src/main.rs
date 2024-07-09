@@ -14,7 +14,6 @@ mod kprobe;
 mod debug;
 mod static_keys;
 
-
 use core::panic::PanicInfo;
 
 use frame::frame_alloc;

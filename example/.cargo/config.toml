@@ -32,3 +32,9 @@ rustflags = [
     "-Cforce-frame-pointers=yes",
     '--cfg=board="qemu"',
 ]
+
+[profile.release]
+panic = "abort"
+#lto = true
+#strip = true
+##opt-level = "z"  # Optimize for size.

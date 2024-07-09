@@ -29,6 +29,11 @@ SECTIONS
         *(.data.prepage .data.prepage.*)
         . = ALIGN(4K);
         _sdata = .;
+
+        __start_jump_table = .;
+        KEEP(*(__jump_table))
+        __end_jump_table = .;
+
         *(.data .data.*)
         *(.sdata .sdata.*)
         _edata = .;

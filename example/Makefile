@@ -1,5 +1,5 @@
 # Building
-ARCH := x86_64
+ARCH := riscv64
 QEMU_EXEC :=
 GDB ?= n
 
