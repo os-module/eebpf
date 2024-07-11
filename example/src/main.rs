@@ -1,6 +1,10 @@
 #![no_std]
 #![no_main]
 #![feature(panic_info_message)]
+#![feature(naked_functions)]
+#![feature(asm_const)]
+#![feature(riscv_ext_intrinsics)]
+#![feature(proc_macro_hygiene)]
 extern crate alloc;
 
 mod allocator;
@@ -87,6 +91,9 @@ fn main(hartid: usize) {
     });
     kprobe::test_kprobe();
 
+    unsafe {
+        static_keys::test();
+    }
     panic!("end of rust_main!");
 }
 

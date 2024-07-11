@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 elf = "0.7"
-rbpf = { git = "https://github.com/qmonnet/rbpf.git" }
-#rbpf = { path = "../rbpf" }
+#rbpf = { git = "https://github.com/qmonnet/rbpf.git" }
+rbpf = { path = "../rbpf" }
 libbpf = { path = "../libbpf" }

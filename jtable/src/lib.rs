@@ -1,10 +1,12 @@
 #![no_std]
 #![feature(specialization)]
+#![feature(riscv_ext_intrinsics)]
 #![allow(incomplete_features)]
-#![feature(asm_goto)]
-mod arch;
 
+mod arch;
 use core::{fmt::Debug, sync::atomic::AtomicBool};
+
+pub use arch::*;
 
 pub const BRANCH_TRUE: usize = 1;
 pub const BRANCH_FALSE: usize = 0;
@@ -81,46 +83,45 @@ pub trait StaticKeyTypeTrait {
 }
 
 impl<T> StaticKeyTypeTrait for T {
+    #[inline]
     default fn static_key_type(&self) -> StaticKeyType {
         StaticKeyType::Other
     }
 }
 
 impl StaticKeyTypeTrait for StaticKeyTrue {
+    #[inline]
     fn static_key_type(&self) -> StaticKeyType {
         StaticKeyType::StaticKeyTrue
     }
 }
 
 impl StaticKeyTypeTrait for StaticKeyFalse {
+    #[inline]
     fn static_key_type(&self) -> StaticKeyType {
         StaticKeyType::StaticKeyFalse
     }
 }
 
 #[macro_export]
-macro_rules! define_static_key_true {
-    ($name:ident) => {
-        static $name: StaticKeyTrue = StaticKeyTrue::new();
-    };
-}
-
-#[macro_export]
-macro_rules! define_static_key_false {
-    ($name:ident) => {
-        static $name: StaticKeyFalse = StaticKeyFalse::new();
-    };
-}
-#[macro_export]
 macro_rules! static_branch_likely {
     ($key:ident) => {{
         if $key.static_key_type() == StaticKeyType::StaticKeyTrue {
-            !arch_static_branch!($key, BRANCH_TRUE)
+            // !arch_static_branch!($key, BRANCH_TRUE)
+            unsafe {
+                paste! {
+                    [<$key _is_false>]()
+                }
+            }
         } else if $key.static_key_type() == StaticKeyType::StaticKeyFalse {
-            !arch_static_branch_jump!($key, BRANCH_FALSE)
+            // !arch_static_branch_jump!($key, BRANCH_FALSE)
+            unsafe {
+                paste! {
+                    [<$key _is_false>]()
+                }
+            }
         } else {
-            // test_static_other();
-            false
+            panic!("static key is not true or false")
         }
     }};
 }
@@ -129,29 +130,47 @@ macro_rules! static_branch_likely {
 macro_rules! static_branch_unlikely {
     ($key:ident) => {{
         if $key.static_key_type() == StaticKeyType::StaticKeyTrue {
-            arch_static_branch_jump!($key, BRANCH_FALSE)
+            // arch_static_branch_jump!($key, BRANCH_FALSE)
+            unsafe {
+                paste! {
+                    ![<$key _is_false>]()
+                }
+            }
         } else if $key.static_key_type() == StaticKeyType::StaticKeyFalse {
-            arch_static_branch!($key, BRANCH_FALSE)
+            // arch_static_branch!($key, BRANCH_FALSE)
+            unsafe {
+                paste! {
+                    ![<$key _is_false>]()
+                }
+            }
         } else {
-            // test_static_other();
-            false
+            panic!("static key is not true or false")
         }
     }};
 }
 
-#[inline(never)]
-pub fn test_static_key_true() {
-    log::info!("test_static_key_true");
+#[macro_export]
+macro_rules! static_branch_enable {
+    ($key:ident) => {{
+        static_key_enable(
+            &$key.0,
+            paste! {
+                    [<$key _is_false>]
+            } as usize,
+        )
+    }};
 }
 
-#[inline(never)]
-pub fn test_static_key_false() {
-    log::info!("test_static_key_false");
-}
-
-#[inline(never)]
-pub fn test_static_other() {
-    log::info!("test_static_other");
+#[macro_export]
+macro_rules! static_branch_disable {
+    ($key:ident) => {{
+        static_key_disable(
+            &$key.0,
+            paste! {
+                    [<$key _is_false>]
+            } as usize,
+        )
+    }};
 }
 
 #[repr(C)]

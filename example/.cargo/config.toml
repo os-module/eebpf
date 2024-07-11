@@ -35,6 +35,6 @@ rustflags = [
 
 [profile.release]
 panic = "abort"
-#lto = true
+lto = true
 #strip = true
-##opt-level = "z"  # Optimize for size.
+opt-level = "z"  # Optimize for size.
