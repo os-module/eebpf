@@ -5,7 +5,7 @@ int counter = 0;
 int counter2 = 1;
 SEC("xdp")
 int hello(void *ctx) {
-//    bpf_printk("Hello World %d", 10);
+//    bpf_printk("Hello World %d", counter2);
 //    bpf_printk("xxxxx yyyyy");
     counter++;
     counter2++;

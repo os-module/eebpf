@@ -94,7 +94,9 @@ impl FindMapOps for FindMapImpl {
     }
     fn map_data_ptr(map_fd: usize) -> *mut u8 {
         let mut map = BPF_MAP.lock();
-        let map = map.get_mut(&map_fd).unwrap();
+        let map = map
+            .get_mut(&map_fd)
+            .expect(format!("map with fd {} not found", map_fd).as_str());
         let value = map
             .get_mut(&MapKey::new(vec![0; map.key_size() as usize]))
             .unwrap();
