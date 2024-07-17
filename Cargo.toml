@@ -5,7 +5,7 @@ members = [
     "example" ,
     "libbpf",
     "jtable",
-    "rbpf"
+    "rbpf",
 ]
 
 resolver = "2"
