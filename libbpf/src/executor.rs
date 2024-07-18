@@ -1,5 +1,7 @@
 use alloc::vec::Vec;
 
+use crate::loader::Relocation;
+use crate::INS_SIZE;
 use anyhow::Result;
 use rbpf::{ebpf, ebpf::to_insn_vec};
 
@@ -13,12 +15,11 @@ pub trait FindMapOps {
 }
 
 impl<F: FindMapOps> BpfExecutor<F> {
-    pub fn process(prog: &[u8]) -> Result<Vec<u8>> {
-        let instructions = to_insn_vec(prog);
+    pub fn process(prog: &[u8], relocations: &[Relocation]) -> Result<Vec<u8>> {
+        let mut instructions = to_insn_vec(prog);
         // we need update the LD_IMM64 instruction
-        let mut new_instructions = Vec::new();
-        let mut index = 0;
-        while index < instructions.len() {
+        for relocation in relocations {
+            let index = relocation.offset / INS_SIZE;
             let mut insn = instructions[index].clone();
             if insn.opc == ebpf::LD_DW_IMM {
                 let mut next_insn = instructions[index + 1].clone();
@@ -30,20 +31,15 @@ impl<F: FindMapOps> BpfExecutor<F> {
                 // the next ins store the map_data_ptr high 32 bits
                 insn.imm = (map_data_ptr + map_data_offset) as i32;
                 next_insn.imm = ((map_data_ptr + map_data_offset) >> 32) as i32;
-                new_instructions.push(insn);
-                new_instructions.push(next_insn);
-                index += 2;
-            } else {
-                new_instructions.push(insn);
-                index += 1;
+                instructions[index] = insn;
+                instructions[index + 1] = next_insn;
             }
         }
-        let prog = new_instructions
+        let prog = instructions
             .iter()
             .map(|ins| ins.to_vec())
             .flatten()
             .collect();
-
         Ok(prog)
     }
 }

@@ -6,6 +6,7 @@ use alloc::{
 };
 use core::marker::PhantomData;
 
+use crate::INS_SIZE;
 use anyhow::Result;
 use elf::{endian::AnyEndian, ElfBytes};
 use rbpf::ebpf::{to_insn_vec, Insn};
@@ -32,7 +33,6 @@ pub trait CreateMapOps {
     fn update_map_element(map_fd: MapFd, key: &[u8], value: &[u8]) -> Result<()>;
 }
 
-const INS_SIZE: usize = 8;
 #[derive(Debug)]
 pub struct Relocation {
     pub offset: usize,
@@ -201,7 +201,7 @@ impl<'data, C: CreateMapOps> BpfLoader<'data, C> {
 
         let relocations = self.relocations(&text_relocation_name)?;
 
-        for relocation in relocations {
+        for relocation in &relocations {
             let ins_index = relocation.offset / INS_SIZE;
 
             let map_fd = bpf_map.get(&relocation.section_index).expect(
@@ -244,6 +244,7 @@ impl<'data, C: CreateMapOps> BpfLoader<'data, C> {
         Ok(Bpf {
             text: prog,
             bpf_map,
+            relocation: relocations,
         })
     }
 }
@@ -266,10 +267,14 @@ impl InsExt for Insn {
 pub struct Bpf {
     text: Vec<u8>,
     bpf_map: BTreeMap<SecIndex, MapFd>,
+    relocation: Vec<Relocation>,
 }
 
 impl Bpf {
     pub fn text(&self) -> &[u8] {
         &self.text
+    }
+    pub fn relocation(&self) -> &[Relocation] {
+        &self.relocation
     }
 }

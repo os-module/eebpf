@@ -11,7 +11,7 @@ use rbpf::{disassembler, helpers};
 use spin::Mutex;
 
 fn main() {
-    env_logger::init_from_env(env_logger::Env::default().default_filter_or("trace"));
+    env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
     let filename = PathBuf::from("./libbpf/bpf/hello.bpf.o");
     let file_data = std::fs::read(filename).expect("Could not read file.");
     let slice = file_data.as_slice();
@@ -27,10 +27,12 @@ fn main() {
 
     disassembler::disassemble(&prog);
 
-    let new_prog = BpfExecutor::<FindMapImpl>::process(prog).unwrap();
+    let new_prog = BpfExecutor::<FindMapImpl>::process(prog, loader.relocation()).unwrap();
 
     log::info!("After the post-processing, the program is:");
     disassembler::disassemble(&new_prog);
+
+    println!("*********************************");
 
     let hkey = helpers::BPF_TRACE_PRINTK_IDX as u8;
     let mut vm = rbpf::EbpfVmRaw::new(Some(&new_prog)).unwrap();

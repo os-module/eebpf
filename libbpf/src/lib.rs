@@ -8,3 +8,5 @@ pub mod print;
 pub mod executor;
 pub mod map;
 mod relocation;
+
+pub const INS_SIZE: usize = 8;
