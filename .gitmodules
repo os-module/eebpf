@@ -1,4 +1,3 @@
 [submodule "rbpf"]
 	path = rbpf
-	url = git@github.com:Godones/rbpf.git
-	branch = main
+	url = https://github.com/Godones/rbpf
