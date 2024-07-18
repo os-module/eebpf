@@ -52,7 +52,7 @@ impl KprobeOps for Kprobe {
         unsafe {
             //
         }
-        log::info!(
+        log::trace!(
             "Kprobe::install: address: {:#x}, func_name: {}, opcode: {:x?}",
             address,
             self.symbol,
@@ -83,7 +83,7 @@ impl Drop for Kprobe {
         unsafe {
             core::ptr::write(address as *mut u32, inst_32);
         }
-        log::info!(
+        log::trace!(
             "Kprobe::drop: address: {:#x}, func_name: {}, opcode: {:x?}",
             address,
             self.symbol,

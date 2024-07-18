@@ -77,7 +77,7 @@ impl KprobeOps for Kprobe {
         unsafe {
             sfence_vma_all();
         }
-        log::info!(
+        log::trace!(
             "Kprobe::install: address: {:#x}, func_name: {}, opcode: {:x?}",
             address,
             self.symbol,
@@ -120,7 +120,7 @@ impl Drop for Kprobe {
         unsafe {
             sfence_vma_all();
         }
-        log::info!(
+        log::trace!(
             "Kprobe::uninstall: address: {:#x}, old_instruction: {:#x?}",
             address,
             self.old_instruction

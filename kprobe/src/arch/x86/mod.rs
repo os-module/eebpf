@@ -67,7 +67,7 @@ impl KprobeOps for Kprobe {
 
         let inst = decoder.decode_slice(&inst_tmp).unwrap();
         let len = inst.len().to_const();
-        log::info!("inst: {:?}, len: {:?}", inst.to_string(), len);
+        log::trace!("inst: {:?}, len: {:?}", inst.to_string(), len);
 
         self.old_instruction = inst_tmp;
         self.old_instruction_len = len as usize;
@@ -75,7 +75,7 @@ impl KprobeOps for Kprobe {
             core::ptr::write_volatile(address as *mut u8, EBREAK_INST);
             core::arch::x86_64::_mm_mfence();
         }
-        log::info!(
+        log::trace!(
             "Kprobe::install: address: {:#x}, func_name: {}",
             address,
             self.symbol
@@ -109,7 +109,7 @@ impl Drop for Kprobe {
         }
         let decoder = yaxpeax_x86::amd64::InstDecoder::default();
         let inst = decoder.decode_slice(&self.old_instruction).unwrap();
-        log::info!(
+        log::trace!(
             "Kprobe::uninstall: address: {:#x}, old_instruction: {:?}",
             address,
             inst.to_string()

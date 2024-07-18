@@ -18,6 +18,8 @@ pub use x86::*;
 
 pub trait ProbeArgs: Send {
     fn as_any(&self) -> &dyn Any;
+    fn break_address(&self) -> usize;
+    fn debug_address(&self) -> usize;
 }
 
 pub trait KprobeOps: Send {
@@ -127,6 +129,14 @@ impl KprobeBasic {
 
     pub fn call_fault_handler(&self, trap_frame: &dyn ProbeArgs) {
         self.fault_handler.call(trap_frame);
+    }
+
+    pub fn symbol(&self) -> &str {
+        &self.symbol
+    }
+
+    pub fn kprobe_address(&self) -> usize {
+        self.symbol_addr + self.offset
     }
 }
 

@@ -3,7 +3,7 @@
 #![feature(panic_info_message)]
 #![feature(naked_functions)]
 #![feature(asm_const)]
-#![feature(riscv_ext_intrinsics)]
+#![cfg_attr(target_arch = "riscv64", feature(riscv_ext_intrinsics))]
 #![feature(proc_macro_hygiene)]
 extern crate alloc;
 
@@ -16,6 +16,7 @@ mod kprobe;
 
 #[cfg(target_arch = "x86_64")]
 mod debug;
+#[cfg(target_arch = "riscv64")]
 mod static_keys;
 
 use core::panic::PanicInfo;
@@ -92,6 +93,7 @@ fn main(hartid: usize) {
     kprobe::test_kprobe();
 
     unsafe {
+        #[cfg(target_arch = "riscv64")]
         static_keys::test();
     }
     panic!("end of rust_main!");
